@@ -318,7 +318,7 @@ html,body{ margin:0; padding:0; background:var(--ink); font-family:'Space Mono',
 
 /* ---- Mobile: single-column layout ---- */
 @media (max-width: 768px){
-  .layout{ grid-template-columns: 1fr; gap: 16px; }
+  .layout{ grid-template-columns: 1fr; gap: 36px; }
 
   /* rail becomes a normal stacked block */
   .cup-rail{ position: static; border-right: none; padding-right: 0; }
