@@ -345,19 +345,19 @@ function miniAvatarRow(names){
     const p = ROSTER[n];
     if(!p) return '';
     const guestMark = GUESTS.some(g=>g.name===n) ? ' ✦' : '';
-    const isCaptain = (n === 'Rui');
-    const icon = avatarWithCrown(p, 30, isCaptain);
-    const nameClass = isCaptain ? 'ra-name captain-badge' : 'ra-name';
-    const nameText = isCaptain ? 'Rui' : `${n}${guestMark}`;
-    return `<div class="run-avatar"><span class="ra-icon">${icon}</span><span class="${nameClass}">${nameText}</span></div>`;
+    // no crown / captain badge in the timeline — those live only in the BOOB RUNNERS bar
+    const icon = avatarWithCrown(p, 30, false);
+    return `<div class="run-avatar"><span class="ra-icon">${icon}</span><span class="ra-name">${n}${guestMark}</span></div>`;
   }).join('');
 }
 
 function buildPhotoGallery(photos){
-  if (!photos || photos.length === 0) return '';
-  return `<div class="run-photos">
-    ${photos.map(src => `<div class="polaroid"><img src="${src}" alt="Run snapshot"></div>`).join('')}
-  </div>`;
+  if(!photos || !photos.length) return '';
+  const tiles = photos.map(src => {
+    const tilt = (Math.random() < 0.5 ? -1 : 1) * (1.5 + Math.random()); // resting tilt ±1.5–2.5°
+    return `<div class="polaroid" style="--tilt:${tilt.toFixed(2)}deg"><img src="${src}" alt="Run snapshot"></div>`;
+  }).join('');
+  return `<div class="run-photos">${tiles}</div>`;
 }
 
 /* Render active run entries — newest first (most recent on top) */
@@ -370,41 +370,43 @@ for(let idx = runLog.length - 1; idx >= 0; idx--){
   const patch = patchIcon(PATCH_ICONS[idx % PATCH_ICONS.length], true);
 
   const hasRoute = window.runHasRoute && window.runHasRoute(log.date);
-  const routeTag = hasRoute ? '<span class="route-tag">🗺 VIEW ROUTE</span>' : '';
+  const mapTile = hasRoute
+    ? '<div class="run-map"><div class="run-map-canvas"></div><button class="run-map-view" type="button">view route <span>&#8599;</span></button></div>'
+    : '';
 
   entry.innerHTML = `
     <div class="run-num">${patch}</div>
     <div class="run-body">
-      <div class="run-head">
-        <span class="run-title">${log.title}</span>
-        <span class="run-date">${log.date}</span>
+      <div class="run-layout">
+        ${mapTile}
+        <div class="run-content">
+          <div class="run-head">
+            <span class="run-title">${log.title}</span>
+            <span class="run-date">${log.date}</span>
+          </div>
+          <div class="run-meta"><span class="rlabel">RUNNERS</span></div>
+          <div class="run-avatars">${miniAvatarRow(log.runners)}</div>
+        </div>
+        ${buildPhotoGallery(log.photos)}
       </div>
-      <div class="run-meta"><span class="rlabel">RUNNERS</span></div>
-      <div class="run-avatars">${miniAvatarRow(log.runners)}</div>
-      ${buildPhotoGallery(log.photos)}
-      ${routeTag}
     </div>
   `;
 
-  if(hasRoute){
-    entry.classList.add('has-route');
-    entry.title = 'Show this route on the map';
-    if(log.date === 'JUN 17') entry.classList.add('active-route');   // matches the map's default
-    entry.addEventListener('click', (e) => {
-      if(e.target.closest('.polaroid')) return;   // let photo clicks be their own thing
-      document.querySelectorAll('.run-entry.active-route').forEach(el => el.classList.remove('active-route'));
-      entry.classList.add('active-route');
-      window.showRoute(log.date);
-    });
-  }
-
   runList.appendChild(entry);
+
+  // mini route map + "view route" modal
+  if(hasRoute){
+    const canvas = entry.querySelector('.run-map-canvas');
+    if(canvas && window.makeMiniMap) window.makeMiniMap(canvas, log.date);
+    const tile = entry.querySelector('.run-map');
+    if(tile && window.openRouteModal) tile.addEventListener('click', () => window.openRouteModal(log.date));
+  }
 }
 
 /* Filter Application System */
 function toggleFilter(name) {
   const grid = document.getElementById('filterGrid');
-  const cells = document.querySelectorAll('.filter-cell');
+  const cells = document.querySelectorAll('.cup-row');
   const entries = document.querySelectorAll('.run-entry');
 
   if (activeFilter === name) {
@@ -432,23 +434,32 @@ const attendance = {};
 [...CREW, ...GUESTS].forEach(p => attendance[p.name] = 0);
 runLog.forEach(r => r.runners.forEach(n => { if(attendance[n] !== undefined) attendance[n]++; }));
 
-/* Render filtering avatar grid headers, sorted by leading attendance */
+/* Render the Boob Cup — a leaderboard ranked by attendance (most runs = 1st) */
 const filterGrid = document.getElementById('filterGrid');
 const rosterByAttendance = [...CREW, ...GUESTS].sort((a,b) => attendance[b.name] - attendance[a.name]);
-rosterByAttendance.forEach(p => {
-  const cell = document.createElement('div');
-  cell.className = 'filter-cell';
-  cell.dataset.name = p.name;
-  cell.dataset.animal = p.animal;
+rosterByAttendance.forEach((p, i) => {
+  const rank = i + 1;
   const isCaptain = p.name === 'Rui';
-  const tagLabel = p.name.toUpperCase();
   const guestMark = GUESTS.some(g => g.name === p.name) ? ' ✦' : '';
-
   const count = attendance[p.name];
-  cell.dataset.tip = `${count} ${count === 1 ? 'run' : 'runs'}`;
 
-  cell.innerHTML = `${avatarWithCrown(p, 44, isCaptain)}<span>${tagLabel}${guestMark}</span>`;
-  cell.addEventListener('click', () => toggleFilter(p.name));
-  attachSpriteAnimation(cell, p.animal, 44);
-  filterGrid.appendChild(cell);
+  const row = document.createElement('div');
+  row.className = 'cup-row' + (rank === 1 ? ' first' : '');
+  row.dataset.name = p.name;
+  row.dataset.animal = p.animal;
+  row.title = `Filter the timeline by ${p.name}`;
+  row.innerHTML = `
+    <span class="cup-rank">${rank}</span>
+    <span class="cup-avatar">${avatarWithCrown(p, 34, isCaptain)}</span>
+    <span class="cup-name">${p.name}${guestMark}</span>
+    <span class="cup-score"><span class="n">${count}</span><span class="u">RUN${count === 1 ? '' : 'S'}</span></span>
+  `;
+  row.addEventListener('click', () => toggleFilter(p.name));
+  attachSpriteAnimation(row, p.animal, 34);
+  filterGrid.appendChild(row);
+});
+
+/* Clicking anywhere outside a Boob Cup row clears the active filter */
+document.addEventListener('click', (e) => {
+  if (activeFilter && !e.target.closest('.cup-row')) toggleFilter(activeFilter);
 });

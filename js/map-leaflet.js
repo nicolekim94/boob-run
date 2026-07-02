@@ -1,11 +1,11 @@
 /* ============================================================
-   MAP — real, accurate map via Leaflet + OpenStreetMap.
-   Free, no API key, no billing. Tiles from CARTO (OSM data),
-   warmed toward the poster's cream/brown palette via CSS.
+   MAP — real, accurate maps via Leaflet + OpenStreetMap.
+   Free, no API key, no billing. Tiles from CARTO (OSM data).
 
-   Holds one route per run (from Strava GPX exports). Clicking a
-   run in the timeline calls window.showRoute(date) to swap the
-   map to that run's path + its photo hot spots.
+   Holds one route per run (from Strava GPX exports). Each timeline
+   event gets a static mini-map thumbnail (window.makeMiniMap); the
+   "view route" button opens a full interactive map
+   (window.openRouteModal) with the route + photo hot spots.
    ============================================================ */
 
 const SUMMIT_LL = [37.7517, -122.4477];   // Twin Peaks (for the pin)
@@ -39,20 +39,13 @@ const ROUTES = {
   },
 };
 
-/* ---- map + tiles ---- */
-const map = L.map('map', {
-  scrollWheelZoom: false,   // don't hijack page scroll
-  zoomControl: true,
-  attributionControl: true,
-});
-map.attributionControl.setPrefix(false);   // drop Leaflet's default flag prefix
-
-// detailed light base map, tinted to the warm Peaks oranges via CSS
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+/* ---- tiles ---- */
+const TILE_URL = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+const TILE_OPTS = {
   subdomains: 'abcd',
   maxZoom: 19,
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-}).addTo(map);
+};
 
 /* ---- helpers ---- */
 function haversine(a, b){
@@ -69,11 +62,12 @@ function pinIcon(label, tone){
     iconSize: [0, 0], iconAnchor: [0, 0],
   });
 }
-function photoIcon(src){
+function photoIcon(src, size){
+  size = size || 46;
   return L.divIcon({
     className: 'photo-hotspot',
-    html: `<span class="ph-ring"><img src="${src}" alt="Run photo"></span>`,
-    iconSize: [46, 46], iconAnchor: [23, 23],
+    html: `<span class="ph-ring" style="width:${size}px;height:${size}px"><img src="${src}" alt="Run photo"></span>`,
+    iconSize: [size, size], iconAnchor: [size / 2, size / 2],
   });
 }
 
@@ -96,59 +90,112 @@ lightbox.addEventListener('click', (e) => {
 });
 document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeLightbox(); });
 
-/* ---- route rendering ---- */
-const routeLayers = L.layerGroup().addTo(map);
-let activeRoute = null;
-
-function showRoute(key){
+/* ---- shared route drawing ----
+   Draws a run's route onto `layer`. Returns the list of points to frame.
+   opts.mini  → simpler summit dot, no photo hot spots (for thumbnails)
+   opts.photos → add clickable photo hot spots (for the full modal) */
+function drawRoute(layer, key, opts){
+  opts = opts || {};
   const r = ROUTES[key];
-  if(!r) return;
-  activeRoute = key;
-  routeLayers.clearLayers();
-
+  if(!r) return [];
   const coords = r.coords;
-  // default Leaflet polyline styling
-  L.polyline(coords).addTo(routeLayers);
 
-  // Twin Peaks pin if the route actually reaches the summit
+  L.polyline(coords, { color: '#3388ff', weight: opts.mini ? 3 : 4, opacity: 0.9 }).addTo(layer);
+
+  // point on the route closest to the Twin Peaks summit
   let ci = 0, best = Infinity;
   for(let i = 0; i < coords.length; i++){
     const d = haversine(coords[i], SUMMIT_LL);
     if(d < best){ best = d; ci = i; }
   }
   if(best < 160){
-    L.marker(coords[ci], { icon: pinIcon('TWIN PEAKS', '#3388ff') }).addTo(routeLayers);
+    if(opts.mini){
+      L.circleMarker(coords[ci], { radius: 5, weight: 2, color: '#fff', fillColor: '#c0392b', fillOpacity: 1 }).addTo(layer);
+    } else {
+      L.marker(coords[ci], { icon: pinIcon('TWIN PEAKS', '#3388ff') }).addTo(layer);
+    }
   }
 
-  // photo hot spots. A photo can be a plain filename (pinned at the south peak,
-  // fanned out) or an object { src, at:[lat,lon] } with its own location.
-  const photos = r.photos || [];
-  const defaultCount = photos.filter(p => typeof p === 'string').length;
-  const photoPts = [SOUTH_PEAK];
-  let di = 0;
-  photos.forEach((p) => {
-    const src = typeof p === 'string' ? p : p.src;
-    let at;
-    if(typeof p === 'string'){
-      const spread = (di - (defaultCount - 1) / 2) * 0.0004;   // fan south-peak photos apart
-      at = [SOUTH_PEAK[0], SOUTH_PEAK[1] + spread];
-      di++;
-    } else {
-      at = p.at;
-    }
-    photoPts.push(at);
-    L.marker(at, { icon: photoIcon(src), riseOnHover: true })
-      .addTo(routeLayers)
-      .on('click', () => openLightbox(src, `${key} · ${r.title}`));
-  });
+  const pts = [SOUTH_PEAK];
+  if(opts.photos){
+    // a photo is a filename (pinned at the south peak, fanned) or { src, at:[lat,lon] }
+    const photos = r.photos || [];
+    const defaultCount = photos.filter(p => typeof p === 'string').length;
+    let di = 0;
+    photos.forEach((p) => {
+      const src = typeof p === 'string' ? p : p.src;
+      let at;
+      if(typeof p === 'string'){
+        at = [SOUTH_PEAK[0], SOUTH_PEAK[1] + (di - (defaultCount - 1) / 2) * 0.0004];
+        di++;
+      } else {
+        at = p.at;
+      }
+      pts.push(at);
+      // photos shown on the map but NOT clickable (no full-screen)
+      L.marker(at, { icon: photoIcon(src, opts.mini ? 26 : 40), interactive: false, keyboard: false }).addTo(layer);
+    });
+  }
+  return coords.concat(pts);
+}
 
-  // frame the route plus every photo location so nothing is off-screen
-  map.fitBounds(coords.concat(photoPts), { padding: [36, 36] });
+/* ---- mini route thumbnail inside a timeline event (static, non-interactive) ---- */
+function makeMiniMap(el, key){
+  if(!el || !ROUTES[key]) return;
+  const m = L.map(el, {
+    zoomControl: false, attributionControl: false,
+    dragging: false, scrollWheelZoom: false, doubleClickZoom: false,
+    boxZoom: false, keyboard: false, touchZoom: false, tap: false,
+  });
+  L.tileLayer(TILE_URL, TILE_OPTS).addTo(m);
+  const pts = drawRoute(L.layerGroup().addTo(m), key, { mini: true });   // route only in the thumbnail
+  m.fitBounds(pts, { padding: [16, 16] });
+  // tiles can lay out before the container has its final size
+  setTimeout(() => { m.invalidateSize(); m.fitBounds(pts, { padding: [16, 16] }); }, 60);
+  return m;
+}
+
+/* ---- full interactive route modal (opened by "view route") ---- */
+const routeModal = document.createElement('div');
+routeModal.className = 'route-modal hidden';
+routeModal.innerHTML =
+  '<div class="route-modal-inner">' +
+  '  <div class="route-modal-bar"><span class="route-modal-title"></span>' +
+  '  <button class="route-modal-close" aria-label="Close">✕</button></div>' +
+  '  <div class="route-modal-map"></div>' +
+  '</div>';
+document.body.appendChild(routeModal);
+const rmTitle = routeModal.querySelector('.route-modal-title');
+const rmMapEl = routeModal.querySelector('.route-modal-map');
+let modalMap = null, modalLayer = null;
+
+function closeRouteModal(){ routeModal.classList.add('hidden'); }
+routeModal.addEventListener('click', (e) => {
+  if(e.target === routeModal || e.target.classList.contains('route-modal-close')) closeRouteModal();
+});
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeRouteModal(); });
+
+function openRouteModal(key){
+  const r = ROUTES[key];
+  if(!r) return;
+  rmTitle.textContent = `${key} · ${r.title}`;
+  routeModal.classList.remove('hidden');
+  // build the map lazily, after the modal is visible so it gets a real size
+  requestAnimationFrame(() => {
+    if(!modalMap){
+      modalMap = L.map(rmMapEl, { scrollWheelZoom: true });
+      modalMap.attributionControl.setPrefix(false);
+      L.tileLayer(TILE_URL, TILE_OPTS).addTo(modalMap);
+      modalLayer = L.layerGroup().addTo(modalMap);
+    }
+    modalLayer.clearLayers();
+    const pts = drawRoute(modalLayer, key, { photos: true });   // photos shown but not clickable
+    modalMap.invalidateSize();
+    modalMap.fitBounds(pts, { padding: [40, 40] });
+  });
 }
 
 /* Expose for the timeline (roster.js) */
-window.showRoute = showRoute;
+window.makeMiniMap = makeMiniMap;
+window.openRouteModal = openRouteModal;
 window.runHasRoute = (key) => !!ROUTES[key];
-
-/* Start on the most recent run */
-showRoute('JUN 17');
