@@ -1,8 +1,6 @@
 # Boob Run 🏃‍♀️
 
-A cute pixel-art poster + timeline for the Wednesday "Boob Run" run club — a
-hand-drawn SVG map of the Twin Peaks route and an 8-bit crew roster with photo
-galleries.
+boob runners!
 
 ## Project structure
 
