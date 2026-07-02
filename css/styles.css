@@ -316,6 +316,28 @@ html,body{ margin:0; padding:0; background:var(--ink); font-family:'Space Mono',
   display: block;
 }
 
+/* ---- Mobile: single-column layout ---- */
+@media (max-width: 768px){
+  .layout{ grid-template-columns: 1fr; gap: 16px; }
+
+  /* rail becomes a normal stacked block */
+  .cup-rail{ position: static; border-right: none; padding-right: 0; }
+
+  /* tighten leaderboard rows for the single-column view */
+  .filter-grid{ gap: 5px; padding-top: 12px; }
+  .cup-row{ padding: 4px 12px 4px 8px; }
+
+  /* hide the little patch icon; stack content → map → photos */
+  .run-num{ display: none; }
+  .run-entry{ grid-template-columns: 1fr; }
+  .run-layout{ flex-direction: column; gap: 14px; }
+  .run-content{ order: 1; }
+  .run-map{ order: 2; width: 100%; flex: 0 0 auto; }
+  .run-photos{ order: 3; width: 100%; flex-wrap: nowrap; margin-top: 0; }
+  .run-photos .polaroid{ flex: 1; width: auto; min-width: 0; }
+  .run-photos .polaroid img{ width: 100%; height: auto; }
+}
+
 @media print{
   body{background:#fff;}
   .stage{padding:0;}
