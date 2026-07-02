@@ -56,7 +56,7 @@ const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
   <div class="col">
     <div class="trophy">🏆</div>
     <div class="name">${leader.toUpperCase()}</div>
-    <div class="sub">is holding the Boob&nbsp;Cup 🏆</div>
+    <div class="sub">is holding the Boob&nbsp;Cup</div>
   </div>
   <div class="brand">BOOB&nbsp;CUP</div>
 </div></body></html>`;
