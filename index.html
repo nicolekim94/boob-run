@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boob Run — Wednesday Run Club</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="stage">
+  <div class="poster">
+
+    <div class="layout">
+      <!-- Left Fixed Sidebar Group -->
+      <div class="fixed-side">
+        <h1 class="main-title">Run to Twin Peaks</h1>
+
+        <div class="map-col">
+          <div id="map"></div>
+        </div>
+      </div>
+
+      <!-- Right Scrollable Main Content Timeline Section -->
+      <div class="list-col">
+        <div class="list-head">
+          <span class="label">BOOB RUNNERS</span>
+        </div>
+
+        <!-- Filter Bar with Crew Avatars immediately beneath header -->
+        <div class="filter-section">
+          <div class="filter-grid" id="filterGrid"></div>
+        </div>
+
+        <!-- Timeline Sub-Header -->
+        <div class="timeline-head">
+          <span class="label">Timeline</span>
+        </div>
+
+        <div id="runList"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+<script src="js/map-leaflet.js" defer></script>
+<script src="js/roster.js" defer></script>
+</body>
+</html>

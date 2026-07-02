@@ -1,0 +1,454 @@
+/* ============================================================
+   ROSTER — crew portraits, run log, timeline & filters
+   ============================================================ */
+
+/* ---- sticker-patch icons ---- */
+const PATCH_SHOE = [
+  [0,0,0,1,1,1,0,0,0],
+  [0,0,1,1,1,1,1,0,0],
+  [0,1,1,0,0,1,1,1,0],
+  [1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1],
+  [0,1,1,1,1,1,1,1,1],
+];
+const PATCH_HEART = [
+  [0,1,1,0,1,1,0],
+  [1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1],
+  [0,1,1,1,1,1,0],
+  [0,0,1,1,1,0,0],
+  [0,0,0,1,0,0,0],
+];
+const PATCH_STAR = [
+  [0,0,0,0,1,0,0,0,0],
+  [0,0,0,1,1,1,0,0,0],
+  [0,0,0,1,1,1,0,0,0],
+  [1,1,1,1,1,1,1,1,1],
+  [0,1,1,1,1,1,1,1,0],
+  [0,1,1,1,1,1,1,1,0],
+  [0,1,1,0,0,0,1,1,0],
+  [0,1,0,0,0,0,0,1,0],
+  [1,0,0,0,0,0,0,0,1],
+];
+const PATCH_TROPHY = [
+  [0,1,1,1,1,1,0],
+  [1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1],
+  [0,1,1,1,1,1,0],
+  [0,0,1,1,1,0,0],
+  [0,0,0,1,0,0,0],
+  [0,0,1,1,1,0,0],
+  [0,1,1,1,1,1,0],
+];
+const PATCH_ICONS = [PATCH_SHOE, PATCH_HEART, PATCH_STAR, PATCH_TROPHY];
+
+/* ---- crew portraits ---- */
+const BODY_ROWS = [
+  [0,0,1,1,1,1,1,1,1,1,0,0,0,0],
+  [0,1,1,1,1,1,1,1,1,1,1,0,0,0],
+  [1,1,1,1,1,1,1,1,1,1,1,1,0,0],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+  [0,1,1,1,1,1,1,1,1,1,1,1,1,0],
+  [0,1,1,1,1,1,1,1,1,1,1,1,1,0],
+  [0,1,1,1,1,1,1,1,1,1,1,1,1,0],
+  [0,0,1,1,1,1,1,1,1,1,1,1,0,0],
+];
+const ANIMALS = {
+  cat: {
+    top: [
+      [0,0,1,0,0,0,0,0,0,0,1,0,0,0],
+      [0,1,1,1,0,0,0,0,0,1,1,1,0,0],
+      [0,1,1,1,1,0,0,0,1,1,1,1,0,0],
+      [0,0,1,1,1,1,0,1,1,1,1,0,0,0],
+      [0,0,0,1,1,1,1,1,1,1,0,0,0,0],
+    ],
+    eyes: [[9,4],[9,9]],
+    feat: [[10,6],[10,7],[11,5],[11,8],[10,1],[10,2],[10,11],[10,12]],
+    eyesShut: [[9,3],[9,4],[9,5],[9,8],[9,9],[9,10]],
+  },
+  dog: {
+    top: [
+      [0,0,0,0,1,1,0,0,1,1,0,0,0,0],
+      [0,0,1,1,1,1,0,0,1,1,1,1,0,0],
+      [0,1,1,1,1,1,0,0,1,1,1,1,1,0],
+      [0,1,1,1,1,1,1,1,1,1,1,1,1,0],
+      [0,0,1,1,1,1,1,1,1,1,1,1,0,0],
+    ],
+    eyes: [[9,4],[9,5],[9,8],[9,9]],
+    feat: [[10,5],[10,9],[11,5],[11,6],[11,7],[11,8],[11,9]],
+    eyesShut: [[9,4],[9,5],[9,8],[9,9]],
+    mouthOpen: [[11,6],[11,7]],
+  },
+  bear: {
+    top: [
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+      [0,0,1,1,0,0,0,0,0,0,1,1,0,0],
+      [0,1,1,1,1,0,0,0,0,1,1,1,1,0],
+      [0,1,1,1,1,1,1,1,1,1,1,1,1,0],
+      [0,0,1,1,1,1,1,1,1,1,1,1,0,0],
+    ],
+    eyes: [[9,4],[9,9]],
+    feat: [[10,6],[10,7]],
+    eyesShut: [[9,3],[9,4],[9,5],[9,8],[9,9],[9,10]],
+  },
+  fox: {
+    top: [
+      [0,0,1,1,0,0,0,0,0,0,1,1,0,0],
+      [0,0,1,1,1,0,0,0,0,1,1,1,0,0],
+      [0,0,1,1,1,1,0,0,1,1,1,1,0,0],
+      [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+      [0,0,0,0,1,1,1,1,1,1,0,0,0,0],
+    ],
+    eyes: [[9,4],[9,9]],
+    feat: [[10,6],[11,5],[11,6],[11,7],[11,8]],
+    eyesShut: [[9,3],[9,4],[9,5],[9,8],[9,9],[9,10]],
+    wink: [[9,4],[9,8],[9,9],[9,10]],
+  },
+  rabbit: {
+    top: [
+      [0,0,0,1,0,0,0,0,0,0,1,0,0,0],
+      [0,0,0,1,0,0,0,0,0,0,1,0,0,0],
+      [0,0,0,1,1,0,0,0,0,1,1,0,0,0],
+      [0,0,0,1,1,1,0,0,1,1,1,0,0,0],
+      [0,0,0,0,1,1,1,1,1,1,0,0,0,0],
+    ],
+    eyes: [[9,4],[9,9]],
+    feat: [[10,6],[10,7],[11,6],[11,7]],
+    eyesShut: [[9,3],[9,4],[9,5],[9,8],[9,9],[9,10]],
+  },
+  owl: {
+    top: [
+      [0,0,0,1,0,0,0,0,0,0,1,0,0,0],
+      [0,0,1,1,0,0,0,0,0,1,1,0,0,0],
+      [0,1,1,1,1,0,0,0,1,1,1,1,0,0],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    ],
+    eyes: [[8,3],[8,4],[9,3],[9,4],[8,9],[8,10],[9,9],[9,10]],
+    feat: [[10,6],[11,6],[11,7]],
+    eyesShut: [[9,3],[9,4],[9,9],[9,10]],
+  },
+  panda: {
+    top: [
+      [0,1,1,0,0,0,0,0,0,0,0,1,1,0],
+      [1,1,1,1,0,0,0,0,0,0,1,1,1,1],
+      [1,1,1,1,0,0,0,0,0,0,1,1,1,1],
+      [0,1,1,0,1,1,1,1,1,1,0,1,1,0],
+      [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+    ],
+    eyes: [[8,3],[8,4],[9,3],[9,4],[10,3],[8,9],[8,10],[9,9],[9,10],[10,10]],
+    feat: [[10,6],[10,7],[11,6],[11,7]],
+    eyesShut: [[9,3],[9,4],[9,9],[9,10]],
+    mouthOpen: [[11,6],[11,7]],
+  },
+  unicorn: {
+    top: [
+      [0,0,0,0,0,4,4,0,0,0,0,0,0,0],
+      [0,0,0,0,0,4,4,0,0,0,0,0,0,0],
+      [0,0,1,0,0,4,4,0,0,1,0,0,0,0],
+      [0,1,1,1,0,4,4,0,1,1,1,0,0,0],
+      [0,0,1,1,1,1,1,1,1,1,0,0,0,0],
+    ],
+    eyes: [[8,4],[9,4],[8,9],[9,9]],
+    feat: [[11,5],[11,6],[11,7],[11,8]],
+    eyesShut: [[9,4],[9,9]],
+  },
+};
+const PALETTE = {1:'#FAF8F2', 2:'#5C3221', 4:'#D9A441'};
+
+/* Sparkle overlays (svg-unit coords) for the unicorn's magical frames */
+const SPARKLE_FRAMES = {
+  1: [[70, 6, '#FAF8F2', 4], [98, 34, '#E3A8AE', 3.5]],
+  2: [[40, 2, '#D9A441', 3.5], [104, 16, '#FAF8F2', 4], [16, 44, '#E3A8AE', 3]],
+};
+
+/* Per-character animation loops — each entry is a "pose" (a sprite frame).
+   pose fields: dx/dy (px shift), sx/sy (squash/stretch about bottom-centre),
+   blink, wink, mouthOpen, sparkle. */
+const SPRITE_FRAMES = {
+  cat:     [{}, {dy:-4, dx:-1}, {dy:-6}, {dy:-4, dx:1}, {}, {blink:true}],           // springy bounce + blink
+  dog:     [{mouthOpen:true}, {dy:-3, mouthOpen:false}, {mouthOpen:true}, {dy:-3, mouthOpen:false}], // panting
+  bear:    [{dx:-2, sy:0.96, dy:2}, {dx:0, dy:-2}, {dx:2, sy:0.96, dy:2}, {dx:0, dy:-2}],            // waddle
+  fox:     [{sy:0.82, dy:8, sx:1.12}, {sy:1.12, dy:-12, sx:0.94}, {dy:-16}, {sy:0.9, dy:4, sx:1.08}, {wink:true}], // pounce + wink
+  rabbit:  [{sy:0.8, dy:8, sx:1.15}, {sy:1.12, dy:-14, sx:0.92}, {dy:-22}, {dy:-12}, {sy:0.86, dy:4, sx:1.1}, {}], // big hops
+  owl:     [{}, {dy:-2}, {blink:true, dy:-2}, {}, {blink:true}, {dy:-2}],            // head bob + blink
+  panda:   [{mouthOpen:true}, {mouthOpen:false, dy:-2}, {mouthOpen:true}, {blink:true}, {mouthOpen:false, dy:-2}], // munching
+  unicorn: [{dy:-2, sparkle:1}, {dy:-6, sparkle:2}, {dy:-9, sparkle:1}, {dy:-6, sparkle:2}, {dy:-2, sparkle:1}, {dy:0}], // float + sparkle
+};
+
+/* Render one sprite frame. pose (optional) animates the pixels within a fixed box. */
+function renderSprite(animalKey, outW, pose){
+  outW = outW || 48;
+  pose = pose || {};
+  const anim = ANIMALS[animalKey];
+  const full = [...anim.top, ...BODY_ROWS];
+  const cols = 14, px = 8.6;
+  const w = cols*px, h = full.length*px;
+  const sx = pose.sx || 1, sy = pose.sy || 1, dx = pose.dx || 0, dy = pose.dy || 0;
+  const pivotX = w/2, pivotY = h;   // squash/stretch anchored at the feet
+  const parts = [];
+  function cell(x, y, fill, s){
+    s = s || px;
+    const X = pivotX + (x - pivotX)*sx + dx;
+    const Y = pivotY + (y - pivotY)*sy + dy;
+    parts.push(`<rect x="${X.toFixed(1)}" y="${Y.toFixed(1)}" width="${(s*sx+0.15).toFixed(2)}" height="${(s*sy+0.15).toFixed(2)}" fill="${fill}"/>`);
+  }
+  // body / fur / horn
+  for(let r=0;r<full.length;r++){
+    for(let c=0;c<full[r].length;c++){
+      const v = full[r][c];
+      if(v && PALETTE[v]) cell(c*px, r*px, PALETTE[v]);
+    }
+  }
+  // facial features (nose / mouth / whiskers)
+  (anim.feat || []).forEach(([r,c]) => cell(c*px, r*px, '#5C3221'));
+  // eyes — open, closed (blink), or winking
+  const eyeSet = pose.blink ? (anim.eyesShut || anim.eyes)
+               : pose.wink  ? (anim.wink || anim.eyes)
+               : anim.eyes;
+  (eyeSet || []).forEach(([r,c]) => cell(c*px, r*px, '#5C3221'));
+  // open mouth (pant / munch)
+  if(pose.mouthOpen && anim.mouthOpen) anim.mouthOpen.forEach(([r,c]) => cell(c*px, r*px, '#E3A8AE'));
+  // blush cheeks
+  cell(w*0.22, h*0.54, '#E3A8AE');
+  cell(w*0.64, h*0.54, '#E3A8AE');
+  // sparkles (unicorn)
+  if(pose.sparkle && SPARKLE_FRAMES[pose.sparkle]){
+    SPARKLE_FRAMES[pose.sparkle].forEach(([x,y,col,s]) => cell(x, y, col, s));
+  }
+  return `<svg viewBox="0 0 ${w} ${h}" width="${outW}" height="${(outW*h/w).toFixed(0)}" style="display:block;">${parts.join('')}</svg>`;
+}
+
+/* idle portrait */
+function buildPortrait(animalKey, outW){
+  return renderSprite(animalKey, outW, {});
+}
+
+/* On hover, cycle a character's sprite frames inside its (static) box. */
+function attachSpriteAnimation(cell, animalKey, size){
+  const frame = cell.querySelector('.avatar-frame');
+  if(!frame) return;
+  const seq = SPRITE_FRAMES[animalKey] || [{}];
+  let i = 0, timer = null;
+  cell.addEventListener('mouseenter', () => {
+    if(timer) return;
+    i = 0;
+    const tick = () => { frame.innerHTML = renderSprite(animalKey, size, seq[i % seq.length]); i++; };
+    tick();
+    timer = setInterval(tick, 130);
+  });
+  cell.addEventListener('mouseleave', () => {
+    clearInterval(timer); timer = null;
+    frame.innerHTML = renderSprite(animalKey, size, {});
+  });
+}
+
+
+/* builds a tiny standalone patch badge */
+function patchIcon(grid, filled){
+  const px = 2.1;
+  const w = grid[0].length*px, h = grid.length*px;
+  const ox = 20 - w/2, oy = 20 - h/2;
+  let rects = '';
+  if(filled){
+    for(let r=0;r<grid.length;r++){
+      for(let c=0;c<grid[r].length;c++){
+        if(grid[r][c]){
+          rects += `<rect x="${(ox+c*px).toFixed(1)}" y="${(oy+r*px).toFixed(1)}" width="${(px+0.12).toFixed(2)}" height="${(px+0.12).toFixed(2)}" fill="#E3A8AE"/>`;
+        }
+      }
+    }
+  }
+  return `<svg viewBox="0 0 40 40" width="34" height="34" style="display:block;">
+    <circle cx="20" cy="20" r="17.5" fill="none" stroke="#5C3221" stroke-width="1.4" stroke-dasharray="0.1 4.2" opacity="${filled?1:0.4}"/>
+    ${rects}
+  </svg>`;
+}
+
+/* ---- roster ---- */
+const CREW = [
+  { name:'Rui',      animal:'cat',    bg:'#D9A441' },
+  { name:'Katy',     animal:'dog',    bg:'#7C9070' },
+  { name:'Allison',  animal:'bear',   bg:'#8C5B44' },
+  { name:'Tiffany',  animal:'fox',    bg:'#D97B4F' },
+  { name:'Gordon',   animal:'rabbit', bg:'#6E8CA0' },
+  { name:'Becca',    animal:'owl',    bg:'#8A8F5C' },
+  { name:'Nicole',   animal:'panda',  bg:'#5C6B73' },
+];
+const GUESTS = [
+  { name:'Hanna', animal:'unicorn', bg:'#E3A8AE' },
+];
+const ROSTER = {};
+[...CREW, ...GUESTS].forEach(p=> ROSTER[p.name] = p);
+
+/* ---- run log ---- */
+const runLog = [
+  {
+    date:'APR 29',
+    title:'Tiff & Rui Twin Peaks Trail Run',
+    runners:['Tiffany','Rui'],
+    photos:['images/apr29-1.jpg', 'images/apr29-2.jpg']
+  },
+  {
+    date:'MAY 06',
+    title:"I walk this lonely boob, the only one I have ever known",
+    runners:['Rui'],
+    photos:['images/may06-1.jpg', 'images/may06-2.jpg']
+  },
+  {
+    date:'MAY 14',
+    title:'Same boob, different day!',
+    runners:['Rui','Allison','Gordon','Nicole'],
+    photos:['images/may14-1.jpg', 'images/may14-2.jpg']
+  },
+  {
+    date:'JUN 10',
+    title:'Booben Arrow',
+    runners:['Rui','Allison','Hanna','Katy','Nicole','Tiffany'],
+    photos:['images/jun10-1.jpg', 'images/jun10-2.jpg']
+  },
+  {
+    date:'JUN 17',
+    title:'boobye derek',
+    runners:['Rui','Nicole','Gordon','Becca'],
+    photos:['images/jun17-1.jpg', 'images/jun17-2.jpg']
+  },
+];
+
+let activeFilter = null;
+
+/* tiny gold pixel crown for the captain */
+function crownSVG(w){
+  const h = Math.round(w * 0.82);
+  return `<svg viewBox="0 0 12 10" width="${w}" height="${h}" style="display:block;overflow:visible;">
+    <path d="M1 6 L2 2 L4 4.7 L6 1.4 L8 4.7 L10 2 L11 6 L11 8.2 L1 8.2 Z" fill="#D9A441" stroke="#5C3221" stroke-width="0.7" stroke-linejoin="round"/>
+    <circle cx="2" cy="2" r="0.7" fill="#E3A8AE"/>
+    <circle cx="6" cy="1.4" r="0.8" fill="#E3A8AE"/>
+    <circle cx="10" cy="2" r="0.7" fill="#E3A8AE"/>
+  </svg>`;
+}
+
+/* static framed box + the animatable pixel character inside it,
+   plus a randomly-tilted crown in a top corner for the captain */
+function avatarWithCrown(p, size, isCaptain){
+  const pixels = buildPortrait(p.animal, size);
+  const side = Math.random() < 0.5 ? 'crown-left' : 'crown-right';
+  const crown = isCaptain ? `<span class="crown ${side}">${crownSVG(Math.round(size*0.6))}</span>` : '';
+  return `<span class="avatar-wrap"><span class="avatar-frame" style="background:${p.bg}">${pixels}</span>${crown}</span>`;
+}
+
+function miniAvatarRow(names){
+  return names.map(n=>{
+    const p = ROSTER[n];
+    if(!p) return '';
+    const guestMark = GUESTS.some(g=>g.name===n) ? ' ✦' : '';
+    const isCaptain = (n === 'Rui');
+    const icon = avatarWithCrown(p, 30, isCaptain);
+    const nameClass = isCaptain ? 'ra-name captain-badge' : 'ra-name';
+    const nameText = isCaptain ? 'Rui' : `${n}${guestMark}`;
+    return `<div class="run-avatar"><span class="ra-icon">${icon}</span><span class="${nameClass}">${nameText}</span></div>`;
+  }).join('');
+}
+
+function buildPhotoGallery(photos){
+  if (!photos || photos.length === 0) return '';
+  return `<div class="run-photos">
+    ${photos.map(src => `<div class="polaroid"><img src="${src}" alt="Run snapshot"></div>`).join('')}
+  </div>`;
+}
+
+/* Render active run entries — newest first (most recent on top) */
+const runList = document.getElementById('runList');
+for(let idx = runLog.length - 1; idx >= 0; idx--){
+  const log = runLog[idx];
+  const entry = document.createElement('div');
+  entry.className = 'run-entry';
+  entry.dataset.runners = JSON.stringify(log.runners);
+  const patch = patchIcon(PATCH_ICONS[idx % PATCH_ICONS.length], true);
+
+  const hasRoute = window.runHasRoute && window.runHasRoute(log.date);
+  const routeTag = hasRoute ? '<span class="route-tag">🗺 VIEW ROUTE</span>' : '';
+
+  entry.innerHTML = `
+    <div class="run-num">${patch}</div>
+    <div class="run-body">
+      <div class="run-head">
+        <span class="run-title">${log.title}</span>
+        <span class="run-date">${log.date}</span>
+      </div>
+      <div class="run-meta"><span class="rlabel">RUNNERS</span></div>
+      <div class="run-avatars">${miniAvatarRow(log.runners)}</div>
+      ${buildPhotoGallery(log.photos)}
+      ${routeTag}
+    </div>
+  `;
+
+  if(hasRoute){
+    entry.classList.add('has-route');
+    entry.title = 'Show this route on the map';
+    if(log.date === 'JUN 17') entry.classList.add('active-route');   // matches the map's default
+    entry.addEventListener('click', (e) => {
+      if(e.target.closest('.polaroid')) return;   // let photo clicks be their own thing
+      document.querySelectorAll('.run-entry.active-route').forEach(el => el.classList.remove('active-route'));
+      entry.classList.add('active-route');
+      window.showRoute(log.date);
+    });
+  }
+
+  runList.appendChild(entry);
+}
+
+/* Filter Application System */
+function toggleFilter(name) {
+  const grid = document.getElementById('filterGrid');
+  const cells = document.querySelectorAll('.filter-cell');
+  const entries = document.querySelectorAll('.run-entry');
+
+  if (activeFilter === name) {
+    activeFilter = null;
+    grid.classList.remove('is-filtering');
+    cells.forEach(c => c.classList.remove('active'));
+    entries.forEach(e => e.classList.remove('hidden'));
+  } else {
+    activeFilter = name;
+    grid.classList.add('is-filtering');
+    cells.forEach(c => {
+      if (c.dataset.name === name) c.classList.add('active');
+      else c.classList.remove('active');
+    });
+    entries.forEach(e => {
+      const runnersList = JSON.parse(e.dataset.runners);
+      if (runnersList.includes(name)) e.classList.remove('hidden');
+      else e.classList.add('hidden');
+    });
+  }
+}
+
+/* Count attendance across the run log */
+const attendance = {};
+[...CREW, ...GUESTS].forEach(p => attendance[p.name] = 0);
+runLog.forEach(r => r.runners.forEach(n => { if(attendance[n] !== undefined) attendance[n]++; }));
+
+/* Render filtering avatar grid headers, sorted by leading attendance */
+const filterGrid = document.getElementById('filterGrid');
+const rosterByAttendance = [...CREW, ...GUESTS].sort((a,b) => attendance[b.name] - attendance[a.name]);
+rosterByAttendance.forEach(p => {
+  const cell = document.createElement('div');
+  cell.className = 'filter-cell';
+  cell.dataset.name = p.name;
+  cell.dataset.animal = p.animal;
+  const isCaptain = p.name === 'Rui';
+  const tagLabel = p.name.toUpperCase();
+  const guestMark = GUESTS.some(g => g.name === p.name) ? ' ✦' : '';
+
+  const count = attendance[p.name];
+  cell.dataset.tip = `${count} ${count === 1 ? 'run' : 'runs'}`;
+
+  cell.innerHTML = `${avatarWithCrown(p, 44, isCaptain)}<span>${tagLabel}${guestMark}</span>`;
+  cell.addEventListener('click', () => toggleFilter(p.name));
+  attachSpriteAnimation(cell, p.animal, 44);
+  filterGrid.appendChild(cell);
+});
