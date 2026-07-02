@@ -45,8 +45,6 @@ const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
   .wrap{width:1200px;height:630px;background:#FAF8F2;position:relative;
     display:flex;align-items:center;justify-content:center;
     font-family:'Space Mono',monospace;color:#5C3221;overflow:hidden;}
-  .frame{position:absolute;inset:24px;border:2px solid #5C3221;opacity:.35;border-radius:8px;}
-  .disc{position:absolute;width:520px;height:520px;border-radius:50%;background:${leaderP.bg};opacity:.16;}
   .col{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:0 60px;}
   .trophy{font-size:132px;line-height:1;}
   .name{font-family:'DotGothic16',monospace;font-size:104px;letter-spacing:8px;margin-top:4px;}
@@ -55,11 +53,9 @@ const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
     font-family:'DotGothic16',monospace;font-size:18px;letter-spacing:6px;color:#5C3221;opacity:.55;}
 </style></head>
 <body><div class="wrap">
-  <div class="frame"></div>
-  <div class="disc"></div>
   <div class="col">
     <div class="trophy">🏆</div>
-    <div class="name">👑 ${leader.toUpperCase()}</div>
+    <div class="name">${leader.toUpperCase()}</div>
     <div class="sub">is holding the Boob&nbsp;Cup 🏆</div>
   </div>
   <div class="brand">BOOB&nbsp;CUP</div>
