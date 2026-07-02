@@ -353,8 +353,10 @@ function miniAvatarRow(names){
 
 function buildPhotoGallery(photos){
   if(!photos || !photos.length) return '';
-  const tiles = photos.map(src => {
-    const tilt = (Math.random() < 0.5 ? -1 : 1) * (1.5 + Math.random()); // resting tilt ±1.5–2.5°
+  // fan the set outward: leftmost photo tilts left, rightmost tilts right
+  const n = photos.length, MAG = 3;
+  const tiles = photos.map((src, i) => {
+    const tilt = n === 1 ? -2.5 : (-1 + (2 * i) / (n - 1)) * MAG;
     return `<div class="polaroid" style="--tilt:${tilt.toFixed(2)}deg"><img src="${src}" alt="Run snapshot"></div>`;
   }).join('');
   return `<div class="run-photos">${tiles}</div>`;
