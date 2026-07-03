@@ -66,7 +66,7 @@ const ANIMALS = {
       [0,0,0,1,1,1,1,1,1,1,0,0,0,0],
     ],
     eyes: [[9,4],[9,9]],
-    feat: [[10,6],[10,7],[11,5],[11,8],[10,1],[10,2],[10,11],[10,12]],
+    feat: [[10,6],[10,7],[11,5],[12,6],[12,7],[11,8],[10,1],[10,2],[10,11],[10,12]],
     eyesShut: [[9,3],[9,4],[9,5],[9,8],[9,9],[9,10]],
   },
   dog: {
@@ -273,7 +273,7 @@ const CREW = [
   { name:'Rui',      animal:'cat',    bg:'#D9A441' },
   { name:'Katy',     animal:'dog',    bg:'#7C9070' },
   { name:'Allison',  animal:'bear',   bg:'#8C5B44' },
-  { name:'Tiffany',  animal:'fox',    bg:'#D97B4F' },
+  { name:'Tac',  animal:'fox',    bg:'#D97B4F' },
   { name:'Gordon',   animal:'rabbit', bg:'#6E8CA0' },
   { name:'Becca',    animal:'owl',    bg:'#8A8F5C' },
   { name:'Nicole',   animal:'panda',  bg:'#5C6B73' },
@@ -289,7 +289,7 @@ const runLog = [
   {
     date:'APR 29',
     title:'Tiff & Rui Twin Peaks Trail Run',
-    runners:['Tiffany','Rui','Allison','Gordon','Nicole'],
+    runners:['Tac','Rui','Allison','Gordon','Nicole'],
     photos:['images/apr29-1.jpg', 'images/apr29-2.jpg']
   },
   {
@@ -307,7 +307,7 @@ const runLog = [
   {
     date:'JUN 10',
     title:'Booben Arrow',
-    runners:['Rui','Allison','Hanna','Katy','Nicole','Tiffany'],
+    runners:['Rui','Allison','Hanna','Katy','Nicole','Tac'],
     photos:['images/jun10-1.jpg', 'images/jun10-2.jpg']
   },
   {
@@ -376,6 +376,15 @@ for(let idx = runLog.length - 1; idx >= 0; idx--){
     ? '<div class="run-map"><div class="run-map-canvas"></div><button class="run-map-view" type="button">view route <span>&#8599;</span></button></div>'
     : '<div class="run-map run-map--empty"><div class="run-map-canvas"><span class="run-map-empty-label">no route logged</span></div><div class="run-map-view">— no route —</div></div>';
 
+  // split regular runners from special guests
+  const isGuest = n => GUESTS.some(g => g.name === n);
+  const crewNames = log.runners.filter(n => !isGuest(n));
+  const guestNames = log.runners.filter(isGuest);
+  const guestRow = guestNames.length
+    ? `<div class="run-meta run-meta-guests"><span class="rlabel">SPECIAL GUESTS</span></div>
+       <div class="run-avatars">${miniAvatarRow(guestNames)}</div>`
+    : '';
+
   entry.innerHTML = `
     <div class="run-num">${patch}</div>
     <div class="run-body">
@@ -383,11 +392,12 @@ for(let idx = runLog.length - 1; idx >= 0; idx--){
         ${mapTile}
         <div class="run-content">
           <div class="run-head">
-            <span class="run-title">${log.title}</span>
             <span class="run-date">${log.date}</span>
+            <span class="run-title">${log.title}</span>
           </div>
           <div class="run-meta"><span class="rlabel">RUNNERS</span></div>
-          <div class="run-avatars">${miniAvatarRow(log.runners)}</div>
+          <div class="run-avatars">${miniAvatarRow(crewNames)}</div>
+          ${guestRow}
         </div>
         ${buildPhotoGallery(log.photos)}
       </div>
