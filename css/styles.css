@@ -227,6 +227,21 @@ html,body{ margin:0; padding:0; background:var(--ink); font-family:'Space Mono',
 .run-map-view span{ font-size: 12px; }
 .run-map:hover .run-map-view{ background: #D9A441; color: var(--ink); }
 
+/* greyed-out placeholder map for runs with no logged route */
+.run-map--empty{ cursor: default; opacity: 0.75; }
+.run-map--empty:hover{ transform: none; box-shadow: 0 4px 6px rgba(92, 50, 33, 0.06); }
+.run-map--empty .run-map-canvas{
+  background:
+    repeating-linear-gradient(45deg, #e6e2d8, #e6e2d8 10px, #ddd8cc 10px, #ddd8cc 20px);
+  display: flex; align-items: center; justify-content: center;
+}
+.run-map-empty-label{
+  font-family: 'DotGothic16', monospace; font-size: 9px; letter-spacing: 1px;
+  color: #8f877a; background: rgba(250, 248, 242, 0.85);
+  padding: 5px 9px; border-radius: 6px;
+}
+.run-map--empty .run-map-view{ background: #b3ab9d; color: var(--cream); cursor: default; }
+
 /* Full interactive route modal */
 .route-modal{
   position: fixed; inset: 0; z-index: 10000;
@@ -266,13 +281,13 @@ html,body{ margin:0; padding:0; background:var(--ink); font-family:'Space Mono',
 .run-meta .rlabel{ font-size:8px; letter-spacing:1.5px; color:var(--ink-soft); margin-right:8px; }
 
 /* Cute avatar containers */
-.run-avatars{ display:flex; flex-wrap:wrap; gap:12px; margin-top:16px; margin-bottom:12px; }
+.run-avatars{ display:flex; flex-wrap:wrap; gap:12px; margin-top:8px; margin-bottom:12px; }
 .run-avatar{ display:flex; flex-direction:column; align-items:center; gap:2px; }
 .run-avatar .ra-icon{ display:block; line-height:0; }
 .run-avatar .ra-icon .avatar-frame { box-shadow: 0 2px 0px rgba(92, 50, 33, 0.15); transition: transform 0.2s ease; }
 .run-avatar:hover .ra-icon .avatar-frame { transform: scale(1.1) rotate(3deg); }
 .run-avatar .ra-name{
-  font-family:'DotGothic16', monospace; font-size:7px; letter-spacing:0.5px; color:var(--ink);
+  font-family:'DotGothic16', monospace; font-size:9px; letter-spacing:0.6px; color:var(--ink);
   background: rgba(227, 168, 174, 0.25); padding: 1px 5px; border-radius: 4px; margin-top: 3px;
   display: flex; align-items: center; gap: 2px;
 }

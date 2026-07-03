@@ -289,7 +289,7 @@ const runLog = [
   {
     date:'APR 29',
     title:'Tiff & Rui Twin Peaks Trail Run',
-    runners:['Tiffany','Rui'],
+    runners:['Tiffany','Rui','Allison','Gordon','Nicole'],
     photos:['images/apr29-1.jpg', 'images/apr29-2.jpg']
   },
   {
@@ -374,7 +374,7 @@ for(let idx = runLog.length - 1; idx >= 0; idx--){
   const hasRoute = window.runHasRoute && window.runHasRoute(log.date);
   const mapTile = hasRoute
     ? '<div class="run-map"><div class="run-map-canvas"></div><button class="run-map-view" type="button">view route <span>&#8599;</span></button></div>'
-    : '';
+    : '<div class="run-map run-map--empty"><div class="run-map-canvas"><span class="run-map-empty-label">no route logged</span></div><div class="run-map-view">— no route —</div></div>';
 
   entry.innerHTML = `
     <div class="run-num">${patch}</div>
