@@ -336,6 +336,10 @@ html,body{ margin:0; padding:0; background:var(--ink); font-family:'Space Mono',
 @media (max-width: 768px){
   .layout{ grid-template-columns: 1fr; gap: 36px; }
 
+  /* shrink + center the page header */
+  .main-title{ font-size: 22px; letter-spacing: 2px; text-align: center; }
+  .timeline-head{ justify-content: center; margin-top: 6px; }
+
   /* rail becomes a normal stacked block */
   .cup-rail{ position: static; border-right: none; padding-right: 0; }
 
@@ -346,12 +350,14 @@ html,body{ margin:0; padding:0; background:var(--ink); font-family:'Space Mono',
   /* hide the little patch icon; stack content → map → photos */
   .run-num{ display: none; }
   .run-entry{ grid-template-columns: 1fr; }
-  .run-layout{ flex-direction: column; gap: 14px; }
-  .run-content{ order: 1; }
+  .run-layout{ flex-direction: column; gap: 22px; }
+  .run-content{ display: contents; }   /* promote header + runners into the column */
+  .run-head{ order: 1; }
   .run-map{ order: 2; width: 100%; flex: 0 0 auto; }
   .run-photos{ order: 3; width: 100%; flex-wrap: nowrap; margin-top: 0; }
+  .run-runners{ order: 4; }
   .run-photos .polaroid{ flex: 1; width: auto; min-width: 0; }
-  .run-photos .polaroid img{ width: 100%; height: auto; }
+  .run-photos .polaroid img{ width: 100%; height: auto; aspect-ratio: 126 / 110; object-fit: cover; }
 }
 
 @media print{

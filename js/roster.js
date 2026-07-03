@@ -395,9 +395,11 @@ for(let idx = runLog.length - 1; idx >= 0; idx--){
             <span class="run-date">${log.date}</span>
             <span class="run-title">${log.title}</span>
           </div>
-          <div class="run-meta"><span class="rlabel">RUNNERS</span></div>
-          <div class="run-avatars">${miniAvatarRow(crewNames)}</div>
-          ${guestRow}
+          <div class="run-runners">
+            <div class="run-meta"><span class="rlabel">RUNNERS</span></div>
+            <div class="run-avatars">${miniAvatarRow(crewNames)}</div>
+            ${guestRow}
+          </div>
         </div>
         ${buildPhotoGallery(log.photos)}
       </div>
