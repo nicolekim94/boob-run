@@ -156,6 +156,30 @@ const ANIMALS = {
     feat: [[11,5],[11,6],[11,7],[11,8]],
     eyesShut: [[9,4],[9,9]],
   },
+  frog: {
+    top: [
+      [0,0,1,1,0,0,0,0,0,0,1,1,0,0],
+      [0,1,1,1,1,0,0,0,0,1,1,1,1,0],
+      [0,1,1,1,1,0,0,0,0,1,1,1,1,0],
+      [0,0,1,1,1,1,1,1,1,1,1,1,0,0],
+      [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+    ],
+    eyes: [[1,2],[1,3],[1,10],[1,11]],   // pupils up in the eye-bumps
+    feat: [[11,4],[11,5],[11,6],[11,7],[11,8],[11,9]],   // wide smile
+    eyesShut: [[1,2],[1,3],[1,10],[1,11]],
+  },
+  pig: {
+    top: [
+      [1,1,0,0,0,0,0,0,0,0,0,0,1,1],
+      [1,1,1,0,0,0,0,0,0,0,0,1,1,1],
+      [0,1,1,1,1,0,0,0,0,1,1,1,1,0],
+      [0,0,1,1,1,1,1,1,1,1,1,1,0,0],
+      [0,0,0,1,1,1,1,1,1,1,1,0,0,0],
+    ],
+    eyes: [[9,4],[9,9]],
+    feat: [[10,6],[10,7],[11,6],[11,7]],   // snout
+    eyesShut: [[9,3],[9,4],[9,5],[9,8],[9,9],[9,10]],
+  },
 };
 const PALETTE = {1:'#FAF8F2', 2:'#5C3221', 4:'#D9A441'};
 
@@ -177,6 +201,8 @@ const SPRITE_FRAMES = {
   owl:     [{}, {dy:-2}, {blink:true, dy:-2}, {}, {blink:true}, {dy:-2}],            // head bob + blink
   panda:   [{mouthOpen:true}, {mouthOpen:false, dy:-2}, {mouthOpen:true}, {blink:true}, {mouthOpen:false, dy:-2}], // munching
   unicorn: [{dy:-2, sparkle:1}, {dy:-6, sparkle:2}, {dy:-9, sparkle:1}, {dy:-6, sparkle:2}, {dy:-2, sparkle:1}, {dy:0}], // float + sparkle
+  frog:    [{sy:0.82, dy:8, sx:1.12}, {sy:1.12, dy:-14, sx:0.92}, {dy:-20}, {dy:-12}, {sy:0.88, dy:4, sx:1.1}, {}], // ribbit hops
+  pig:     [{}, {dy:-3, dx:-1}, {dy:-5}, {dy:-3, dx:1}, {}, {dy:-2}], // happy bounce
 };
 
 /* Render one sprite frame. pose (optional) animates the pixels within a fixed box. */
@@ -279,7 +305,9 @@ const CREW = [
   { name:'Nicole',   animal:'panda',  bg:'#5C6B73' },
 ];
 const GUESTS = [
-  { name:'Hanna', animal:'unicorn', bg:'#E3A8AE' },
+  { name:'Hanna',  animal:'unicorn', bg:'#E3A8AE' },
+  { name:'Joanne', animal:'frog', bg:'#6FA35B' },
+  { name:'Logan',  animal:'pig',  bg:'#D98BA0' },
 ];
 const ROSTER = {};
 [...CREW, ...GUESTS].forEach(p=> ROSTER[p.name] = p);
@@ -316,7 +344,24 @@ const runLog = [
     runners:['Rui','Nicole','Gordon','Becca'],
     photos:['images/jun17-1.jpg', 'images/jun17-2.jpg']
   },
+  {
+    date:'JUL 07',
+    title:'Return of the Boob',
+    runners:['Rui','Nicole','Allison','Gordon','Joanne','Logan'],
+    photos:['images/jul07-1.jpg', 'images/jul07-2.jpg']
+  },
 ];
+
+/* Newcomers = anyone whose first-ever run is the most recent event.
+   They get the ✦ star (and are listed as regular runners). */
+const _latestRun = runLog.length - 1;
+const _firstSeen = {}, _lastSeen = {};
+runLog.forEach((r, i) => r.runners.forEach(n => {
+  if(_firstSeen[n] === undefined) _firstSeen[n] = i;
+  _lastSeen[n] = i;
+}));
+const newcomers = new Set(Object.keys(_firstSeen).filter(n => _firstSeen[n] === _latestRun));
+const star = n => newcomers.has(n) ? ' ✦' : '';
 
 let activeFilter = null;
 
@@ -344,10 +389,9 @@ function miniAvatarRow(names){
   return names.map(n=>{
     const p = ROSTER[n];
     if(!p) return '';
-    const guestMark = GUESTS.some(g=>g.name===n) ? ' ✦' : '';
-    // no crown / captain badge in the timeline — those live only in the BOOB RUNNERS bar
+    // no crown / captain badge in the timeline — those live only in the BOOB CUP bar
     const icon = avatarWithCrown(p, 30, false);
-    return `<div class="run-avatar"><span class="ra-icon">${icon}</span><span class="ra-name">${n}${guestMark}</span></div>`;
+    return `<div class="run-avatar"><span class="ra-icon">${icon}</span><span class="ra-name">${n}</span></div>`;
   }).join('');
 }
 
@@ -376,15 +420,6 @@ for(let idx = runLog.length - 1; idx >= 0; idx--){
     ? '<div class="run-map"><div class="run-map-canvas"></div><button class="run-map-view" type="button">view route <span>&#8599;</span></button></div>'
     : '<div class="run-map run-map--empty"><div class="run-map-canvas"><span class="run-map-empty-label">no route logged</span></div><div class="run-map-view">— no route —</div></div>';
 
-  // split regular runners from special guests
-  const isGuest = n => GUESTS.some(g => g.name === n);
-  const crewNames = log.runners.filter(n => !isGuest(n));
-  const guestNames = log.runners.filter(isGuest);
-  const guestRow = guestNames.length
-    ? `<div class="run-meta run-meta-guests"><span class="rlabel">SPECIAL GUESTS</span></div>
-       <div class="run-avatars">${miniAvatarRow(guestNames)}</div>`
-    : '';
-
   entry.innerHTML = `
     <div class="run-num">${patch}</div>
     <div class="run-body">
@@ -397,8 +432,7 @@ for(let idx = runLog.length - 1; idx >= 0; idx--){
           </div>
           <div class="run-runners">
             <div class="run-meta"><span class="rlabel">RUNNERS</span></div>
-            <div class="run-avatars">${miniAvatarRow(crewNames)}</div>
-            ${guestRow}
+            <div class="run-avatars">${miniAvatarRow(log.runners)}</div>
           </div>
         </div>
         ${buildPhotoGallery(log.photos)}
@@ -448,17 +482,21 @@ const attendance = {};
 [...CREW, ...GUESTS].forEach(p => attendance[p.name] = 0);
 runLog.forEach(r => r.runners.forEach(n => { if(attendance[n] !== undefined) attendance[n]++; }));
 
-/* Render the Boob Cup — a leaderboard ranked by attendance (most runs = 1st) */
+/* Render the Boob Cup — ranked by attendance; newcomers win ties */
+const CUP_VISIBLE = 8;   // show top 8, hide the rest behind "see all"
 const filterGrid = document.getElementById('filterGrid');
-const rosterByAttendance = [...CREW, ...GUESTS].sort((a,b) => attendance[b.name] - attendance[a.name]);
+const rosterByAttendance = [...CREW, ...GUESTS].sort((a,b) => {
+  if(attendance[b.name] !== attendance[a.name]) return attendance[b.name] - attendance[a.name];
+  return (_lastSeen[b.name] ?? -1) - (_lastSeen[a.name] ?? -1);  // ties: most recent runner first
+});
 rosterByAttendance.forEach((p, i) => {
   const rank = i + 1;
   const isCaptain = p.name === 'Rui';
-  const guestMark = GUESTS.some(g => g.name === p.name) ? ' ✦' : '';
+  const guestMark = star(p.name);
   const count = attendance[p.name];
 
   const row = document.createElement('div');
-  row.className = 'cup-row' + (rank === 1 ? ' first' : '');
+  row.className = 'cup-row' + (rank === 1 ? ' first' : '') + (i >= CUP_VISIBLE ? ' cup-hidden' : '');
   row.dataset.name = p.name;
   row.dataset.animal = p.animal;
   row.title = `Filter the timeline by ${p.name}`;
@@ -473,7 +511,21 @@ rosterByAttendance.forEach((p, i) => {
   filterGrid.appendChild(row);
 });
 
+/* "see all" toggle for entries beyond the top 8 */
+if(rosterByAttendance.length > CUP_VISIBLE){
+  const extra = rosterByAttendance.length - CUP_VISIBLE;
+  const seeAll = document.createElement('button');
+  seeAll.type = 'button';
+  seeAll.className = 'cup-seeall';
+  seeAll.textContent = `see all (+${extra})`;
+  seeAll.addEventListener('click', () => {
+    const expanded = filterGrid.classList.toggle('show-all');
+    seeAll.textContent = expanded ? 'show less' : `see all (+${extra})`;
+  });
+  filterGrid.appendChild(seeAll);
+}
+
 /* Clicking anywhere outside a Boob Cup row clears the active filter */
 document.addEventListener('click', (e) => {
-  if (activeFilter && !e.target.closest('.cup-row')) toggleFilter(activeFilter);
+  if (activeFilter && !e.target.closest('.cup-row, .cup-seeall')) toggleFilter(activeFilter);
 });

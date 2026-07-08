@@ -168,6 +168,19 @@ html,body{ margin:0; padding:0; background:var(--ink); font-family:'Space Mono',
 .cup-score .n { font-family: 'DotGothic16', monospace; font-size: 16px; }
 .cup-score .u { font-size: 8px; letter-spacing: 1px; opacity: 0.7; margin-top: 3px; }
 
+/* top-8 cap + "see all" toggle */
+.cup-row.cup-hidden{ display: none; }
+.filter-grid.show-all .cup-row.cup-hidden{ display: grid; }
+.cup-seeall{
+  margin-top: 4px; width: 100%;
+  font-family: 'DotGothic16', monospace; font-size: 10px; letter-spacing: 1px;
+  color: var(--ink-soft); background: transparent;
+  border: 1px dotted rgba(92, 50, 33, 0.4); border-radius: 999px;
+  padding: 9px; cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.cup-seeall:hover{ color: var(--ink); border-color: var(--ink); }
+
 /* Active filter state */
 .filter-grid.is-filtering .cup-row { opacity: 0.4; }
 .filter-grid.is-filtering .cup-row.active {
