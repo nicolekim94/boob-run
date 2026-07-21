@@ -180,6 +180,30 @@ const ANIMALS = {
     feat: [[10,6],[10,7],[11,6],[11,7]],   // snout
     eyesShut: [[9,3],[9,4],[9,5],[9,8],[9,9],[9,10]],
   },
+  mouse: {
+    top: [
+      [0,1,1,1,0,0,0,0,0,0,1,1,1,0],
+      [1,1,1,1,1,0,0,0,0,1,1,1,1,1],
+      [1,1,1,1,1,0,0,0,0,1,1,1,1,1],
+      [0,1,1,1,1,1,1,1,1,1,1,1,1,0],
+      [0,0,1,1,1,1,1,1,1,1,1,1,0,0],
+    ],
+    eyes: [[9,4],[9,9]],
+    feat: [[10,6],[10,7],[11,6],[11,7]],   // little snout
+    eyesShut: [[9,3],[9,4],[9,5],[9,8],[9,9],[9,10]],
+  },
+  koala: {
+    top: [
+      [1,1,1,0,0,0,0,0,0,0,0,1,1,1],
+      [1,1,1,1,0,0,0,0,0,0,1,1,1,1],
+      [1,1,1,1,0,0,0,0,0,0,1,1,1,1],
+      [0,1,1,1,1,1,1,1,1,1,1,1,1,0],
+      [0,0,1,1,1,1,1,1,1,1,1,1,0,0],
+    ],
+    eyes: [[9,4],[9,9]],
+    feat: [[10,6],[10,7],[11,5],[11,6],[11,7],[11,8]],   // big nose
+    eyesShut: [[9,3],[9,4],[9,5],[9,8],[9,9],[9,10]],
+  },
 };
 const PALETTE = {1:'#FAF8F2', 2:'#5C3221', 4:'#D9A441'};
 
@@ -203,6 +227,8 @@ const SPRITE_FRAMES = {
   unicorn: [{dy:-2, sparkle:1}, {dy:-6, sparkle:2}, {dy:-9, sparkle:1}, {dy:-6, sparkle:2}, {dy:-2, sparkle:1}, {dy:0}], // float + sparkle
   frog:    [{sy:0.82, dy:8, sx:1.12}, {sy:1.12, dy:-14, sx:0.92}, {dy:-20}, {dy:-12}, {sy:0.88, dy:4, sx:1.1}, {}], // ribbit hops
   pig:     [{}, {dy:-3, dx:-1}, {dy:-5}, {dy:-3, dx:1}, {}, {dy:-2}], // happy bounce
+  mouse:   [{}, {dy:-2, dx:-1}, {dy:-3}, {dy:-2, dx:1}, {}, {blink:true}], // quick scurry + blink
+  koala:   [{}, {dx:-1}, {blink:true}, {dx:1}, {}, {blink:true}],          // sleepy sway
 };
 
 /* Render one sprite frame. pose (optional) animates the pixels within a fixed box. */
@@ -305,9 +331,11 @@ const CREW = [
   { name:'Nicole',   animal:'panda',  bg:'#5C6B73' },
 ];
 const GUESTS = [
-  { name:'Hanna',  animal:'unicorn', bg:'#E3A8AE' },
-  { name:'Joanne', animal:'frog', bg:'#6FA35B' },
-  { name:'Logan',  animal:'pig',  bg:'#D98BA0' },
+  { name:'Hanna',     animal:'unicorn', bg:'#E3A8AE' },
+  { name:'Joanne',    animal:'frog', bg:'#6FA35B' },
+  { name:'Logan',     animal:'pig',  bg:'#D98BA0' },
+  { name:'Anying',    animal:'mouse', bg:'#B07AA1' },
+  { name:'Katherine', animal:'koala', bg:'#7BA7B0' },
 ];
 const ROSTER = {};
 [...CREW, ...GUESTS].forEach(p=> ROSTER[p.name] = p);
@@ -349,6 +377,12 @@ const runLog = [
     title:'Return of the Boob',
     runners:['Rui','Nicole','Allison','Gordon','Joanne','Logan'],
     photos:['images/jul07-1.jpg', 'images/jul07-2.jpg']
+  },
+  {
+    date:'JUL 16',
+    title:"Boob Run - Thursday's Version",
+    runners:['Rui','Allison','Nicole','Anying','Katherine'],
+    photos:['images/jul16-1.jpg', 'images/jul16-2.jpg']
   },
 ];
 
