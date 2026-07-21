@@ -2,46 +2,6 @@
    ROSTER — crew portraits, run log, timeline & filters
    ============================================================ */
 
-/* ---- sticker-patch icons ---- */
-const PATCH_SHOE = [
-  [0,0,0,1,1,1,0,0,0],
-  [0,0,1,1,1,1,1,0,0],
-  [0,1,1,0,0,1,1,1,0],
-  [1,1,1,1,1,1,1,1,1],
-  [1,1,1,1,1,1,1,1,1],
-  [0,1,1,1,1,1,1,1,1],
-];
-const PATCH_HEART = [
-  [0,1,1,0,1,1,0],
-  [1,1,1,1,1,1,1],
-  [1,1,1,1,1,1,1],
-  [0,1,1,1,1,1,0],
-  [0,0,1,1,1,0,0],
-  [0,0,0,1,0,0,0],
-];
-const PATCH_STAR = [
-  [0,0,0,0,1,0,0,0,0],
-  [0,0,0,1,1,1,0,0,0],
-  [0,0,0,1,1,1,0,0,0],
-  [1,1,1,1,1,1,1,1,1],
-  [0,1,1,1,1,1,1,1,0],
-  [0,1,1,1,1,1,1,1,0],
-  [0,1,1,0,0,0,1,1,0],
-  [0,1,0,0,0,0,0,1,0],
-  [1,0,0,0,0,0,0,0,1],
-];
-const PATCH_TROPHY = [
-  [0,1,1,1,1,1,0],
-  [1,1,1,1,1,1,1],
-  [1,1,1,1,1,1,1],
-  [0,1,1,1,1,1,0],
-  [0,0,1,1,1,0,0],
-  [0,0,0,1,0,0,0],
-  [0,0,1,1,1,0,0],
-  [0,1,1,1,1,1,0],
-];
-const PATCH_ICONS = [PATCH_SHOE, PATCH_HEART, PATCH_STAR, PATCH_TROPHY];
-
 /* ---- crew portraits ---- */
 const BODY_ROWS = [
   [0,0,1,1,1,1,1,1,1,1,0,0,0,0],
@@ -298,28 +258,6 @@ function attachSpriteAnimation(cell, animalKey, size){
   });
 }
 
-
-/* builds a tiny standalone patch badge */
-function patchIcon(grid, filled){
-  const px = 2.1;
-  const w = grid[0].length*px, h = grid.length*px;
-  const ox = 20 - w/2, oy = 20 - h/2;
-  let rects = '';
-  if(filled){
-    for(let r=0;r<grid.length;r++){
-      for(let c=0;c<grid[r].length;c++){
-        if(grid[r][c]){
-          rects += `<rect x="${(ox+c*px).toFixed(1)}" y="${(oy+r*px).toFixed(1)}" width="${(px+0.12).toFixed(2)}" height="${(px+0.12).toFixed(2)}" fill="#E3A8AE"/>`;
-        }
-      }
-    }
-  }
-  return `<svg viewBox="0 0 40 40" width="34" height="34" style="display:block;">
-    <circle cx="20" cy="20" r="17.5" fill="none" stroke="#5C3221" stroke-width="1.4" stroke-dasharray="0.1 4.2" opacity="${filled?1:0.4}"/>
-    ${rects}
-  </svg>`;
-}
-
 /* ---- roster ---- */
 const CREW = [
   { name:'Rui',      animal:'cat',    bg:'#D9A441' },
@@ -447,7 +385,6 @@ for(let idx = runLog.length - 1; idx >= 0; idx--){
   const entry = document.createElement('div');
   entry.className = 'run-entry';
   entry.dataset.runners = JSON.stringify(log.runners);
-  const patch = patchIcon(PATCH_ICONS[idx % PATCH_ICONS.length], true);
 
   const hasRoute = window.runHasRoute && window.runHasRoute(log.date);
   const mapTile = hasRoute
@@ -455,7 +392,6 @@ for(let idx = runLog.length - 1; idx >= 0; idx--){
     : '<div class="run-map run-map--empty"><div class="run-map-canvas"><span class="run-map-empty-label">no route logged</span></div><div class="run-map-view">— no route —</div></div>';
 
   entry.innerHTML = `
-    <div class="run-num">${patch}</div>
     <div class="run-body">
       <div class="run-layout">
         ${mapTile}
