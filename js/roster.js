@@ -276,6 +276,8 @@ const GUESTS = [
   { name:'Katherine', animal:'koala', bg:'#7BA7B0' },
   { name:'Jackie',            animal:'cat', bg:'#C77F55' },
   { name:"Jackie's Mother",   animal:'cat', bg:'#9E6B4A' },
+  { name:'Ingrid',            animal:'fox', bg:'#C97B4A' },
+  { name:'Dilveen',           animal:'unicorn', bg:'#B98BC9' },
 ];
 const ROSTER = {};
 [...CREW, ...GUESTS].forEach(p=> ROSTER[p.name] = p);
@@ -329,6 +331,12 @@ const runLog = [
     title:"Jackie's Mother's Abs",
     runners:['Allison','Jackie',"Jackie's Mother",'Katherine','Becca','Gordon','Tac'],
     photos:['images/jul21-1.jpg', 'images/jul21-2.jpg']
+  },
+  {
+    date:'JUL 30',
+    title:'Boob-o-cratic Run',
+    runners:['Allison','Rui','Anying','Gordon','Ingrid','Becca','Dilveen'],
+    photos:['images/jul30-1.jpg', 'images/jul30-2.jpg']
   },
 ];
 
