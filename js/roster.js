@@ -338,6 +338,12 @@ const runLog = [
     runners:['Allison','Rui','Anying','Gordon','Ingrid','Becca','Dilveen'],
     photos:['images/jul30-1.jpg', 'images/jul30-2.jpg']
   },
+  {
+    date:'AUG 06',
+    title:'throw boob thursday',
+    runners:['Rui','Allison','Nicole','Becca'],
+    photos:['images/aug06-1.jpg', 'images/aug06-2.jpg']
+  },
 ];
 
 /* Newcomers = anyone whose first-ever run is the most recent event.
