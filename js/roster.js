@@ -307,6 +307,7 @@ const GUESTS = [
   { name:"Jackie's Mother",   animal:'cat', bg:'#9E6B4A' },
   { name:'Ingrid',            animal:'fox', bg:'#C97B4A' },
   { name:'Dilveen',           animal:'unicorn', bg:'#B98BC9' },
+  { name:'Eliot',             animal:'dog', bg:'#5F8FB0' },
 ];
 const ROSTER = {};
 [...CREW, ...GUESTS].forEach(p=> ROSTER[p.name] = p);
@@ -372,6 +373,12 @@ const runLog = [
     title:'throw boob thursday',
     runners:['Rui','Allison','Nicole','Becca'],
     photos:['images/aug06-1.jpg', 'images/aug06-2.jpg']
+  },
+  {
+    date:'AUG 11',
+    title:'I like to boob it, boob it! I like to BOOB IT!',
+    runners:['Rui','Anying','Nicole','Gordon','Eliot'],
+    photos:['images/aug11-1.jpg', 'images/aug11-2.jpg']
   },
 ];
 
