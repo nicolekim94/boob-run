@@ -239,23 +239,52 @@ function buildPortrait(animalKey, outW){
   return renderSprite(animalKey, outW, {});
 }
 
-/* On hover, cycle a character's sprite frames inside its (static) box. */
-function attachSpriteAnimation(cell, animalKey, size){
+/* Accessibility + input-mode gates (evaluated once). */
+const prefersReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const canHover = matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+/* Per-character idle tempo (ms/frame) — motion tempo expresses personality. */
+const TEMPO = { mouse: 90, cat: 120, rabbit: 110, frog: 110, koala: 200, owl: 170 };
+
+/* A whisper-subtle 2-frame breathing loop so a character is never fully frozen. */
+const IDLE_POSE = [{}, { dy: -2 }];
+
+/* Idle-loop always; escalate to the full pose cycle on hover.
+   rAF-driven (pauses on hidden tab), pre-rendered frames, reduced-motion aware. */
+function attachSpriteAnimation(cell, animalKey, size, index){
   const frame = cell.querySelector('.avatar-frame');
   if(!frame) return;
-  const seq = SPRITE_FRAMES[animalKey] || [{}];
-  let i = 0, timer = null;
-  cell.addEventListener('mouseenter', () => {
-    if(timer) return;
-    i = 0;
-    const tick = () => { frame.innerHTML = renderSprite(animalKey, size, seq[i % seq.length]); i++; };
-    tick();
-    timer = setInterval(tick, 130);
-  });
-  cell.addEventListener('mouseleave', () => {
-    clearInterval(timer); timer = null;
-    frame.innerHTML = renderSprite(animalKey, size, {});
-  });
+  index = index || 0;
+
+  // pre-render every pose ONCE so each tick is a cheap cached string swap
+  const hoverSeq = (SPRITE_FRAMES[animalKey] || [{}]).map(p => renderSprite(animalKey, size, p));
+  const idleSeq  = prefersReduced ? [renderSprite(animalKey, size, {})]
+                                  : IDLE_POSE.map(p => renderSprite(animalKey, size, p));
+  const step = TEMPO[animalKey] || 130;
+
+  let seq = idleSeq, i = 0, last = 0, raf = null;
+  let acc = (index * 40) % step;   // stagger so the crowd doesn't breathe in lockstep
+
+  const loop = (t) => {
+    if(!last) last = t;
+    acc += t - last; last = t;
+    if(acc >= step){ acc -= step; frame.innerHTML = seq[i % seq.length]; i++; }
+    raf = requestAnimationFrame(loop);
+  };
+  const start = () => { if(!raf){ last = 0; raf = requestAnimationFrame(loop); } };
+  const stop  = () => { cancelAnimationFrame(raf); raf = null; };
+
+  frame.innerHTML = idleSeq[0];
+  if(!prefersReduced) start();
+
+  if(canHover && !prefersReduced){
+    cell.addEventListener('mouseenter', () => { seq = hoverSeq; i = 0; });
+    // no hard reset — let it drift back into the idle loop on the next tick
+    cell.addEventListener('mouseleave', () => { seq = idleSeq; });
+  }
+
+  // Sonner principle: don't burn frames on a hidden tab
+  document.addEventListener('visibilitychange', () => document.hidden ? stop() : start());
 }
 
 /* ---- roster ---- */
@@ -499,7 +528,7 @@ rosterByAttendance.forEach((p, i) => {
     <span class="cup-score"><span class="n">${count}</span><span class="u">RUN${count === 1 ? '' : 'S'}</span></span>
   `;
   row.addEventListener('click', () => toggleFilter(p.name));
-  attachSpriteAnimation(row, p.animal, 34);
+  attachSpriteAnimation(row, p.animal, 34, i);
   filterGrid.appendChild(row);
 });
 

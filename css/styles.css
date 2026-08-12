@@ -296,8 +296,11 @@ html,body{ margin:0; padding:0; background:var(--ink); font-family:'Space Mono',
 .run-avatars{ display:flex; flex-wrap:wrap; gap:8px 10px; margin-top:8px; margin-bottom:12px; }
 .run-avatar{ display:flex; flex-direction:column; align-items:center; gap:2px; }
 .run-avatar .ra-icon{ display:block; line-height:0; }
-.run-avatar .ra-icon .avatar-frame { box-shadow: 0 2px 0px rgba(92, 50, 33, 0.15); transition: transform 0.2s ease; }
-.run-avatar:hover .ra-icon .avatar-frame { transform: scale(1.1) rotate(3deg); }
+.run-avatar .ra-icon .avatar-frame { box-shadow: 0 2px 0px rgba(92, 50, 33, 0.15); transition: transform 180ms cubic-bezier(0.23, 1, 0.32, 1); }
+.run-avatar:hover .ra-icon .avatar-frame { transform: scale(1.08); }
+@media (prefers-reduced-motion: reduce) {
+  .run-avatar:hover .ra-icon .avatar-frame { transform: none; }
+}
 .run-avatar .ra-name{
   font-family:'DotGothic16', monospace; font-size:9px; letter-spacing:0.6px; color:var(--ink);
   background: transparent; padding: 1px 5px; border-radius: 4px; margin-top: 3px;
